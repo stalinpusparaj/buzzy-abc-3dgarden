@@ -10,3 +10,4 @@ tests/e2e/**/*-snapshots
 src/data/glyphs.*.json
 package-lock.json
 *.md
+.scratch

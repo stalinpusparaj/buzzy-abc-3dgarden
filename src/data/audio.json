@@ -1,0 +1,23 @@
+{
+  "_note": "PLACEHOLDER audio from scripts/make-placeholder-audio.ts. Phase 6: point these at real files.",
+  "sfx": {
+    "file": "assets/audio/sfx.mp3",
+    "sprite": {
+      "pop": [0, 0.14],
+      "boop": [0.26, 0.28],
+      "chime": [0.66, 1],
+      "buzz": [1.78, 0.45],
+      "whoosh": [2.35, 0.55],
+      "bloom": [3.02, 0.9],
+      "celebrate": [4.04, 1.1]
+    }
+  },
+  "music": {
+    "en": "assets/audio/music-loop.mp3",
+    "ta": "assets/audio/music-loop.mp3"
+  },
+  "song": {
+    "en": "assets/audio/song-dummy.mp3",
+    "ta": "assets/audio/song-dummy.mp3"
+  }
+}

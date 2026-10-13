@@ -1,7 +1,10 @@
+import { loadFont } from './core/fonts';
 import { Game } from './game';
+import { decorateBloom } from './scenes/Bloom';
 import { GardenScene } from './scenes/GardenScene';
 import { LetterFlow } from './scenes/LetterFlow';
 import { overviewPose } from './scenes/poses';
+import { SingAlong } from './scenes/SingAlong';
 import { installTestHooks } from './testHooks';
 import { LoadingScreen } from './ui/loading';
 import { mountRotatePrompt } from './ui/rotatePrompt';
@@ -27,12 +30,17 @@ async function boot(): Promise<void> {
   g.machine.register('start', { enter: () => g.hud.setMode('hidden'), exit: () => {} });
   g.machine.register('garden', garden);
   g.machine.register('letter', new LetterFlow(g));
-  g.machine.register('sing', {
-    enter: () => void g.world.buzzy.celebrate().then(() => g.machine.go('garden', undefined)),
-    exit: () => {},
-  });
-  installTestHooks(g, { targets: () => [] });
+  g.machine.register('sing', new SingAlong(g));
+  installTestHooks(g);
 
+  g.voice.onNoVoice = () => g.sfx.play('chime');
+  // Fonts + SFX in parallel with the first frames; never block on them for long.
+  await Promise.race([
+    Promise.all([loadFont(g.lang), g.sfx.load()]),
+    new Promise((r) => setTimeout(r, 4000)),
+  ]);
+  decorateBloomed(g);
+  loading.progress(0.8);
   g.machine.go('start', undefined);
   g.rig.set(overviewPose(g.aspect));
   g.loop.start();
@@ -45,8 +53,17 @@ async function boot(): Promise<void> {
 
   await loading.waitForStart();
   g.audio.unlock();
+  g.voice.unlock();
   loading.hide();
   g.machine.go('garden', undefined);
+  void g.music.start(g.lang);
+  void g.voice.say('welcome').then(() => g.voice.say('pick_flower'));
+}
+
+/** Re-create saved blooms (they persist in the garden, brief §5.1). */
+function decorateBloomed(g: Game): void {
+  const bloomed = g.storage.get().bloomed;
+  for (const b of g.world.buds) if (bloomed.includes(b.letter.id)) decorateBloom(g, b);
 }
 
 void boot();

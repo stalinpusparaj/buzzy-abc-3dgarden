@@ -1,4 +1,7 @@
+import type { Vector3 } from 'three';
+import { Models } from './core/assets';
 import { AudioEngine } from './core/audio';
+import { Music } from './core/music';
 import { CameraRig } from './core/cameraRig';
 import { Input } from './core/input';
 import { Loop } from './core/loop';
@@ -6,7 +9,9 @@ import { guessTier, isForced, Quality, refineTier } from './core/quality';
 import { createRenderContext, type RenderContext } from './core/renderer';
 import { StateMachine } from './core/stateMachine';
 import { Storage } from './core/storage';
+import { Sfx } from './core/sfx';
 import { Scope } from './core/tween';
+import { Voice } from './core/voice';
 import lettersEn from './data/letters.en.json';
 import type { Lang, LetterDef } from './data/types';
 import { World } from './scenes/World';
@@ -37,7 +42,17 @@ export class Game {
   readonly hud: Hud;
   readonly quality: Quality;
   readonly storage: Storage;
+  readonly models = new Models();
+  readonly sfx: Sfx;
+  readonly voice: Voice;
+  readonly music: Music;
   lang: Lang;
+  /** Sing-along cue firings (song time vs cue time), for the timing test. */
+  readonly cueLog: { id: string; expected: number; actual: number }[] = [];
+  /** Test hooks: hints fired, and the world points the current activity wants touched. */
+  hintCount = 0;
+  private targetsFn: () => Vector3[] = () => [];
+  private wrongFn: () => Vector3[] = () => [];
   /** Letters completed this session (brief P7 gentle stop). */
   session = { started: performance.now(), completed: 0, sleepyShown: false };
 
@@ -47,6 +62,13 @@ export class Game {
     const { renderer, scene, camera } = this.rc;
     this.storage = new Storage();
     this.lang = this.storage.get().lang;
+    this.sfx = new Sfx(this.audio);
+    this.music = new Music(this.audio);
+    this.voice = new Voice(
+      this.audio,
+      () => this.lang,
+      !new URLSearchParams(location.search).has('e2e'),
+    );
     this.world = new World(scene, this.scope, camera);
     this.quality = new Quality(
       refineTier(tier0, renderer),
@@ -73,6 +95,21 @@ export class Game {
     this.loop.onPauseChange((hidden) => this.audio.setHidden(hidden));
     this.applyVolumes();
     this.world.setLetters(this.letters());
+    this.world.particles.cap = this.quality.particles;
+    this.quality.onChange(() => (this.world.particles.cap = this.quality.particles));
+  }
+
+  setTargets(fn: () => Vector3[], wrong: () => Vector3[] = () => []): void {
+    this.targetsFn = fn;
+    this.wrongFn = wrong;
+  }
+
+  targets(): Vector3[] {
+    return this.targetsFn();
+  }
+
+  wrongTargets(): Vector3[] {
+    return this.wrongFn();
   }
 
   letters(lang: Lang = this.lang): LetterDef[] {

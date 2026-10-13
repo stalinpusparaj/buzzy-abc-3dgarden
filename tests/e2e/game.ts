@@ -38,3 +38,40 @@ export async function tapBud(page: Page, id: string): Promise<void> {
   if (!p) throw new Error(`no bud ${id}`);
   await page.mouse.click(p.x, p.y);
 }
+
+type Pt = { x: number; y: number };
+
+async function targets(page: Page): Promise<Pt[]> {
+  return hook(page, 'targets');
+}
+
+/** Wait until the current mini-game exposes targets (intro finished, game built). */
+export async function waitTargets(page: Page, timeout = 30_000): Promise<void> {
+  await expect.poll(async () => (await targets(page)).length, { timeout }).toBeGreaterThan(0);
+}
+
+export async function drag(page: Page, path: Pt[], stepsPerSegment = 3): Promise<void> {
+  const [first, ...rest] = path;
+  if (!first) return;
+  await page.mouse.move(first.x, first.y);
+  await page.mouse.down();
+  for (const p of rest) await page.mouse.move(p.x, p.y, { steps: stepsPerSegment });
+  await page.mouse.up();
+}
+
+/** Play the current mini-game to completion using only real pointer input. */
+export async function playMiniGame(page: Page, template: string): Promise<void> {
+  await waitTargets(page);
+  for (let guard = 0; guard < 40; guard++) {
+    if ((await hook(page, 'state')) !== 'letter') return;
+    const t = await targets(page);
+    if (t.length === 0) {
+      await page.waitForTimeout(300);
+      continue;
+    }
+    if (template === 'pollenPop') await page.mouse.click(t[0]!.x, t[0]!.y);
+    else if (template === 'traceTrail') await drag(page, t, 2);
+    else await drag(page, t, 8);
+    await page.waitForTimeout(template === 'basketMatch' ? 1500 : 350);
+  }
+}

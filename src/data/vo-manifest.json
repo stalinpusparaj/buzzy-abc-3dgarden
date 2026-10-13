@@ -1,0 +1,192 @@
+{
+  "tap_to_start": {
+    "en": "",
+    "ta": "",
+    "textEn": "Tap to play!",
+    "textTa": "தொட்டு விளையாடு!",
+    "_note": "REVIEW(ta): Tamil line from ASSET_PROMPTS.md, verify with a native speaker before recording"
+  },
+  "welcome": {
+    "en": "",
+    "ta": "",
+    "textEn": "Hi! I'm Buzzy! Welcome to my garden!",
+    "textTa": "வணக்கம்! நான் பஸ்ஸி! என் தோட்டத்துக்கு வா!",
+    "_note": "REVIEW(ta): Tamil line from ASSET_PROMPTS.md, verify with a native speaker before recording"
+  },
+  "pick_flower": {
+    "en": "",
+    "ta": "",
+    "textEn": "Pick a flower!",
+    "textTa": "ஒரு பூவைத் தொடு!",
+    "_note": "REVIEW(ta): Tamil line from ASSET_PROMPTS.md, verify with a native speaker before recording"
+  },
+  "pp_instruction": {
+    "en": "",
+    "ta": "",
+    "textEn": "Pop the bubbles with {glyph}!",
+    "textTa": "{glyph} இருக்கும் குமிழ்களை உடை!",
+    "_note": "REVIEW(ta): Tamil line from ASSET_PROMPTS.md, verify with a native speaker before recording"
+  },
+  "tt_instruction": {
+    "en": "",
+    "ta": "",
+    "textEn": "Trace {glyph} with your finger. Follow me!",
+    "textTa": "விரலால் {glyph} வரை. என் பின்னால் வா!",
+    "_note": "REVIEW(ta): Tamil line from ASSET_PROMPTS.md, verify with a native speaker before recording"
+  },
+  "bm_instruction": {
+    "en": "",
+    "ta": "",
+    "textEn": "Which one starts with {sound}? Put it in my basket!",
+    "textTa": "{glyph}-வில் தொடங்குவது எது? கூடையில் போடு!",
+    "_note": "REVIEW(ta): Tamil line from ASSET_PROMPTS.md, verify with a native speaker before recording"
+  },
+  "great_1": {
+    "en": "",
+    "ta": "",
+    "textEn": "Yay!",
+    "textTa": "சூப்பர்!",
+    "_note": "REVIEW(ta): Tamil line from ASSET_PROMPTS.md, verify with a native speaker before recording"
+  },
+  "great_2": {
+    "en": "",
+    "ta": "",
+    "textEn": "Great job!",
+    "textTa": "அருமை!",
+    "_note": "REVIEW(ta): Tamil line from ASSET_PROMPTS.md, verify with a native speaker before recording"
+  },
+  "great_3": {
+    "en": "",
+    "ta": "",
+    "textEn": "You did it!",
+    "textTa": "நீ செய்துட்டே!",
+    "_note": "REVIEW(ta): Tamil line from ASSET_PROMPTS.md, verify with a native speaker before recording"
+  },
+  "try_again": {
+    "en": "",
+    "ta": "",
+    "textEn": "Oops! Try this one!",
+    "textTa": "அச்சச்சோ! இதை முயற்சி செய்!",
+    "_note": "REVIEW(ta): Tamil line from ASSET_PROMPTS.md, verify with a native speaker before recording"
+  },
+  "look_here": {
+    "en": "",
+    "ta": "",
+    "textEn": "Look here!",
+    "textTa": "இங்கே பார்!",
+    "_note": "REVIEW(ta): Tamil line from ASSET_PROMPTS.md, verify with a native speaker before recording"
+  },
+  "letter_is_for": {
+    "en": "",
+    "ta": "",
+    "textEn": "{glyph} is for {word}!",
+    "textTa": "{glyph}, {word}!",
+    "_note": "REVIEW(ta): Tamil line from ASSET_PROMPTS.md, verify with a native speaker before recording"
+  },
+  "sing_intro": {
+    "en": "",
+    "ta": "",
+    "textEn": "Let's sing the garden song!",
+    "textTa": "தோட்டப் பாட்டு பாடலாம் வா!",
+    "_note": "REVIEW(ta): Tamil line from ASSET_PROMPTS.md, verify with a native speaker before recording"
+  },
+  "sleepy": {
+    "en": "",
+    "ta": "",
+    "textEn": "Buzzy is sleepy… let's play more tomorrow!",
+    "textTa": "பஸ்ஸிக்குத் தூக்கம் வருது… நாளைக்கு விளையாடலாம்!",
+    "_note": "REVIEW(ta): Tamil line from ASSET_PROMPTS.md, verify with a native speaker before recording"
+  },
+  "parent_gate_hint": {
+    "en": "",
+    "ta": "",
+    "textEn": "Grown-ups only!",
+    "textTa": "பெரியவர்களுக்கு மட்டும்!",
+    "_note": "REVIEW(ta): Tamil line from ASSET_PROMPTS.md, verify with a native speaker before recording"
+  },
+  "thats_a": {
+    "en": "",
+    "ta": "",
+    "textEn": "That's a {word}!",
+    "textTa": "{word}!",
+    "_note": "TODO(content): brief §5.4 English line; the Tamil phrasing is not in the brief, placeholder says only the word. REVIEW(ta)"
+  },
+  "A_isfor": {
+    "en": "",
+    "ta": "",
+    "textEn": "A is for Apple!",
+    "textTa": ""
+  },
+  "A_sound": {
+    "en": "",
+    "ta": "",
+    "textEn": "A",
+    "textTa": "",
+    "_note": "TODO(content): record the letter's sound; TTS placeholder says the letter name"
+  },
+  "B_isfor": {
+    "en": "",
+    "ta": "",
+    "textEn": "B is for Bee!",
+    "textTa": ""
+  },
+  "B_sound": {
+    "en": "",
+    "ta": "",
+    "textEn": "B",
+    "textTa": "",
+    "_note": "TODO(content): record the letter's sound; TTS placeholder says the letter name"
+  },
+  "C_isfor": {
+    "en": "",
+    "ta": "",
+    "textEn": "C is for Cat!",
+    "textTa": ""
+  },
+  "C_sound": {
+    "en": "",
+    "ta": "",
+    "textEn": "C",
+    "textTa": "",
+    "_note": "TODO(content): record the letter's sound; TTS placeholder says the letter name"
+  },
+  "D_isfor": {
+    "en": "",
+    "ta": "",
+    "textEn": "D is for Duck!",
+    "textTa": ""
+  },
+  "D_sound": {
+    "en": "",
+    "ta": "",
+    "textEn": "D",
+    "textTa": "",
+    "_note": "TODO(content): record the letter's sound; TTS placeholder says the letter name"
+  },
+  "E_isfor": {
+    "en": "",
+    "ta": "",
+    "textEn": "E is for Egg!",
+    "textTa": ""
+  },
+  "E_sound": {
+    "en": "",
+    "ta": "",
+    "textEn": "E",
+    "textTa": "",
+    "_note": "TODO(content): record the letter's sound; TTS placeholder says the letter name"
+  },
+  "F_isfor": {
+    "en": "",
+    "ta": "",
+    "textEn": "F is for Fish!",
+    "textTa": ""
+  },
+  "F_sound": {
+    "en": "",
+    "ta": "",
+    "textEn": "F",
+    "textTa": "",
+    "_note": "TODO(content): record the letter's sound; TTS placeholder says the letter name"
+  }
+}

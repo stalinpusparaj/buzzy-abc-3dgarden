@@ -25,3 +25,16 @@
 8. Stubbed: the letter scene is a placeholder knot; gazebo tap just makes Buzzy celebrate (sing-along lands in Phase 3).
 9. Risk: the fps number is from an M1 Max with CPU throttling, not a real low-end Android GPU; Phase 7's device matrix is the real test.
 10. Risk: quality tiers pick "high" on desktop (2048 shadow map); the auto-drop exists but is only exercised in Phase 7.
+
+## Phase 2: The 3 templates with English data (2026-10-13)
+
+1. ✅ All 6 English letters play end to end with real pointer input (e2e): A/D Pollen Pop, B/E Trace the Trail, C/F Basket Match. Blooms persist across a reload.
+2. ✅ `traceMath.ts` unit tests cover on-path progress, off-path pause, forward-only, the 15 % jump guard, stroke order and multi-stroke completion (8 tests).
+3. ✅ Hints fire after 2 misses (Pollen Pop) and after 6 s idle (Basket Match, Trace); wrong answers never block (e2e).
+4. ✅ LetterIntro (bud opens, 3D glyph rises, sung slice, "A is for Apple!", object pops in; skippable after the first view) and Bloom (full bloom, glyph + object stay in the garden, confetti, Buzzy celebrates).
+5. ✅ Fonts pipeline: `build-letters.ts` extracts glyph outlines from self-hosted Baloo 2 / Baloo Thambi 2 (OFL); 3D glyphs are extruded with a rounded bevel at runtime.
+6. ✅ Content is data: zod schema + `validate-data.ts` run on every build; templates load as lazy chunks from a registry.
+7. ✅ Fully bloomed garden: 66 draw calls on high tier (shadows), 45 on low; JS 202 KB gzip across 16 chunks (zod not shipped).
+8. Stubbed: VO is speechSynthesis (en-IN / ta-IN); SFX, music and the song are synthesised placeholders; 3D props are primitive placeholders.
+9. Risk: English stroke centre lines were measured from the font, but stroke *order* follows common uppercase practice; check it against the scheme your schools teach.
+10. Risk: placeholder props are recognisable but crude; Basket Match leans on them most, so it benefits first from the Phase 6 GLBs.

@@ -34,6 +34,8 @@ export class Buzzy {
   private blinkIn = 2.5;
   private faceTarget: Vector3 | null = null;
   private eyesBusy = false;
+  private followTarget: Vector3 | null = null;
+  private baseScale: number;
   flying = false;
   sleepy = false;
   groundY = 0;
@@ -49,6 +51,7 @@ export class Buzzy {
     this.rig.add(p.body);
     this.root.add(this.rig);
     this.root.scale.setScalar(scale);
+    this.baseScale = scale;
     this.root.name = 'buzzy';
     this.shadow = createBlobShadow(1.8 * scale);
     this.collider = sphereCollider(this.root, 1.5, 0);
@@ -67,10 +70,31 @@ export class Buzzy {
   }
 
   teleport(p: Vector3): void {
+    this.followTarget = null;
     this.move.kill();
     this.move = this.scope.child();
     this.flying = false;
     this.root.position.copy(p);
+  }
+
+  /** Smoothly hover after a moving target every frame (trace: follow the finger). */
+  follow(target: Vector3 | null): void {
+    if (target) {
+      this.move.kill();
+      this.move = this.scope.child();
+      this.flying = false;
+    }
+    this.followTarget = target ? target.clone() : null;
+  }
+
+  /** Shrink/grow (mini-games use a smaller Buzzy so she never hides the play area). */
+  setScale(k: number, duration = 0.5): Promise<void> {
+    const from = this.root.scale.x;
+    const to = this.baseScale * k;
+    return this.scope.tween({
+      duration,
+      update: (e) => this.root.scale.setScalar(from + (to - from) * e),
+    });
   }
 
   lookAt(target: Vector3 | null): void {
@@ -79,6 +103,7 @@ export class Buzzy {
 
   /** Arc along a CatmullRom curve, banking into turns (brief §4: 1.2 s). */
   flyTo(target: Vector3, duration = 1.2): Promise<void> {
+    this.followTarget = null;
     this.move.kill();
     this.move = this.scope.child();
     const from = this.root.position.clone();
@@ -181,6 +206,9 @@ export class Buzzy {
     p.wingR.rotation.z = flap;
     // Idle bob ±0.15 at 0.8 Hz, plus any jump.
     this.rig.position.y = Math.sin(this.t * Math.PI * 2 * 0.8) * 0.15 + this.jump;
+    if (this.followTarget && !this.flying) {
+      this.root.position.lerp(this.followTarget, Math.min(1, dt * 10));
+    }
     if (!this.flying) this.bank = lerp(this.bank, 0, Math.min(1, dt * 6));
     // Face the camera (or a target) when not flying.
     if (!this.flying) {

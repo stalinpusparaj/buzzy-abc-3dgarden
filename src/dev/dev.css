@@ -1,0 +1,73 @@
+/* Dev tools only (stroke editor, cue recorder). A stylesheet, not style attributes: CSP-safe. */
+.devtool {
+  position: fixed;
+  inset: 0;
+  overflow: auto;
+  background: #fffaf0;
+  color: #2b2233;
+  font:
+    14px system-ui,
+    sans-serif;
+  padding: 12px;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  user-select: text;
+  -webkit-user-select: text;
+  touch-action: auto;
+}
+.devtool canvas {
+  background: #fff;
+  border: 1px solid #ccc;
+  cursor: crosshair;
+  touch-action: none;
+}
+.devtool .panel {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 440px;
+}
+.devtool .row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.devtool p {
+  margin: 0;
+}
+.devtool textarea {
+  width: 100%;
+  font: 12px monospace;
+}
+.devtool button {
+  font: inherit;
+  padding: 6px 12px;
+}
+.devtool .keys {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 6px;
+}
+.devtool .key {
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  padding: 8px 4px;
+  text-align: center;
+  font-size: 22px;
+}
+.devtool .key.hit {
+  border-color: #3ccf4e;
+  background: #eaffea;
+}
+.devtool .key small {
+  display: block;
+  font-size: 11px;
+  color: #666;
+}
+.devtool .ok {
+  color: #1a7f2b;
+}
+.devtool .bad {
+  color: #b00020;
+}

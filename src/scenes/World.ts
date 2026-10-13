@@ -14,6 +14,7 @@ import { Bud } from '../entities/Bud';
 import { Buzzy } from '../entities/Buzzy';
 import { Clouds, createDecor } from '../entities/Decor';
 import { Gazebo } from '../entities/Gazebo';
+import { PollenParticles } from '../entities/PollenParticles';
 import { createIsland } from '../entities/Island';
 import { createSky } from '../entities/Sky';
 import { budPositions, BUZZY_HOME, GAZEBO_POS } from './layout';
@@ -26,6 +27,7 @@ export class World {
   readonly gazebo = new Gazebo();
   readonly clouds = new Clouds();
   readonly buzzy: Buzzy;
+  readonly particles = new PollenParticles();
   buds: Bud[] = [];
   private budScope: Scope;
 
@@ -52,7 +54,7 @@ export class World {
     this.root.add(this.island);
     this.root.add(...createDecor([...budPositions(), GAZEBO_POS]));
     this.gazebo.root.position.copy(GAZEBO_POS);
-    this.root.add(this.gazebo.root, this.clouds.mesh);
+    this.root.add(this.gazebo.root, this.clouds.mesh, this.particles.points);
 
     this.buzzy = new Buzzy(scope.child(), camera, 1.15);
     this.buzzy.addTo(this.root);
@@ -81,6 +83,7 @@ export class World {
 
   private update(dt: number): void {
     this.clouds.update(dt);
+    this.particles.update(dt);
     for (const b of this.buds) b.update(dt);
   }
 }

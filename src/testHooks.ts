@@ -24,6 +24,10 @@ export interface TestApi {
   fps(): number;
   tier(): string;
   bloomed(): string[];
+  hints(): number;
+  wrongTargets(): { x: number; y: number }[];
+  cueLog(): { id: string; expected: number; actual: number }[];
+  audioState(): string;
   /** On-screen size (CSS px) of each bud's visual bounds and its hit collider. */
   tapTargets(): { id: string; visualW: number; visualH: number; collider: number }[];
 }
@@ -51,7 +55,7 @@ function screenBox(g: Game, box: Box3): { w: number; h: number } {
 }
 
 /** E2E hooks: only installed with `?e2e=1`. Read-only views of game state, no shortcuts. */
-export function installTestHooks(g: Game, extra: { targets: () => Vector3[] }): void {
+export function installTestHooks(g: Game): void {
   if (!new URLSearchParams(location.search).has('e2e')) return;
   const frames: number[] = [];
   g.loop.add(() => {
@@ -75,7 +79,11 @@ export function installTestHooks(g: Game, extra: { targets: () => Vector3[] }): 
       return b ? toScreen(g, b.collider.getWorldPosition(new Vector3())) : null;
     },
     gazeboScreen: () => toScreen(g, g.world.gazebo.collider.getWorldPosition(new Vector3())),
-    targets: () => extra.targets().map((p) => toScreen(g, p)),
+    targets: () => g.targets().map((p) => toScreen(g, p)),
+    hints: () => g.hintCount,
+    wrongTargets: () => g.wrongTargets().map((p) => toScreen(g, p)),
+    cueLog: () => [...g.cueLog],
+    audioState: () => g.audio.ctx?.state ?? 'none',
     fps: () => (frames.length ? 1000 / (frames.reduce((a, b) => a + b, 0) / frames.length) : 0),
     tier: () => g.quality.tier,
     bloomed: () => [...g.storage.get().bloomed],

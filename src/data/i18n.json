@@ -1,0 +1,32 @@
+{
+  "_note": "Parent-zone and grown-up strings. REVIEW(ta): every Tamil string needs a native-speaker check.",
+  "strings": {
+    "parent_title": { "en": "For grown-ups", "ta": "பெரியவர்களுக்கு" },
+    "gate_tap": { "en": "Tap {number}", "ta": "{number} ஐத் தொடவும்" },
+    "gate_close": { "en": "Close", "ta": "மூடு" },
+    "language": { "en": "Language", "ta": "மொழி" },
+    "tracing": { "en": "Tracing difficulty", "ta": "வரைதல் நிலை" },
+    "tracing_little": { "en": "Little (3–4)", "ta": "சிறியவர் (3–4)" },
+    "tracing_big": { "en": "Big (5–6)", "ta": "பெரியவர் (5–6)" },
+    "volume": { "en": "Volume", "ta": "ஒலி அளவு" },
+    "vol_music": { "en": "Music", "ta": "இசை" },
+    "vol_voice": { "en": "Voice", "ta": "குரல்" },
+    "vol_sfx": { "en": "Sounds", "ta": "ஒலிகள்" },
+    "learning": { "en": "What your child is learning", "ta": "உங்கள் குழந்தை கற்பவை" },
+    "bloomed": { "en": "Bloomed", "ta": "மலர்ந்தது" },
+    "not_yet": { "en": "Not yet", "ta": "இன்னும் இல்லை" },
+    "reset": { "en": "Reset progress", "ta": "முன்னேற்றத்தை அழி" },
+    "reset_confirm": { "en": "Yes, reset all blooms", "ta": "ஆம், எல்லாவற்றையும் அழி" },
+    "reset_cancel": { "en": "Cancel", "ta": "ரத்து" },
+    "privacy": {
+      "en": "Privacy: this game collects no personal data. There are no accounts, ads or analytics. Progress is saved only on this device.",
+      "ta": "தனியுரிமை: இந்த விளையாட்டு எந்த தனிப்பட்ட தகவலையும் சேகரிப்பதில்லை. கணக்குகள், விளம்பரங்கள், கண்காணிப்பு எதுவும் இல்லை. முன்னேற்றம் இந்தச் சாதனத்தில் மட்டுமே சேமிக்கப்படும்."
+    },
+    "privacy_link": { "en": "Read the privacy note", "ta": "தனியுரிமைக் குறிப்பைப் படிக்க" },
+    "more": { "en": "More from Buzzy", "ta": "பஸ்ஸியின் மற்றவை" },
+    "website": { "en": "Our website", "ta": "எங்கள் இணையதளம்" },
+    "app_store": { "en": "Buzzy on the App Store", "ta": "App Store இல் பஸ்ஸி" },
+    "play_store": { "en": "Buzzy on Google Play", "ta": "Google Play இல் பஸ்ஸி" },
+    "back": { "en": "Back to the garden", "ta": "தோட்டத்துக்குத் திரும்பு" }
+  }
+}

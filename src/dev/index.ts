@@ -13,7 +13,11 @@ export function readDevMode(search: string): DevMode | null {
 
 export { attachPerfOverlay } from './perfOverlay';
 
-/** Full-page dev tools (stroke editor, cue recorder) replace the game. Built in Phase 3. */
-export function startTool(mode: 'strokes' | 'cues', root: HTMLElement): void {
-  root.textContent = `${mode} tool: coming in Phase 3`;
+/** Full-page dev tools (stroke editor, cue recorder) replace the game. */
+export async function startTool(mode: 'strokes' | 'cues', root: HTMLElement): Promise<void> {
+  await import('./dev.css');
+  document.body.dataset.devtool = mode;
+  if (mode === 'strokes') (await import('./strokeEditor')).startStrokeEditor(root);
+  else (await import('./cueRecorder')).startCueRecorder(root);
+  document.body.dataset.ready = '1';
 }

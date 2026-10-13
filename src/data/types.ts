@@ -1,6 +1,8 @@
 /** Content types (brief §6.1). `src/data/schema.ts` validates JSON against the same shape with zod. */
+import type { TemplateId } from '../minigames/registry';
+
+export type { TemplateId };
 export type Lang = 'en' | 'ta';
-export type TemplateId = 'pollenPop' | 'traceTrail' | 'basketMatch';
 
 export interface LetterDef {
   id: string; // "A" | "ta_a"

@@ -45,3 +45,25 @@ export function buzzyBesideBud(bud: Bud): Vector3 {
     .addScaledVector(side, 4)
     .add(new Vector3(0, 0.4, 0));
 }
+
+/**
+ * Mini-game stage: a play frame floating just in front of (and above) the bud, so nothing in
+ * the garden sits between it and the camera. Stage +z faces the camera.
+ */
+export function stageFrame(bud: Bud): { origin: Vector3; yaw: number; pose: Pose } {
+  const head = bud.headWorld();
+  const dir = towardViewer(head);
+  const origin = head
+    .clone()
+    .addScaledVector(dir, 4)
+    .add(new Vector3(0, 2.6, 0));
+  const pos = origin
+    .clone()
+    .addScaledVector(dir, 10.5)
+    .add(new Vector3(0, 1.4, 0));
+  return {
+    origin,
+    yaw: Math.atan2(dir.x, dir.z),
+    pose: { pos, look: origin.clone().add(new Vector3(0, -0.1, 0)) },
+  };
+}

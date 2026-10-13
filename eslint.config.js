@@ -14,6 +14,7 @@ export default defineConfig(
       'test-results',
       'playwright-report',
       'public',
+      '.scratch',
     ],
   },
   js.configs.recommended,

@@ -16,6 +16,10 @@ Format: date · decision · why · alternative rejected. Every dependency lists 
 | prettier | 3.9.10 | dev | 0 | Formatting |
 | tsx | 4.23.15 | dev | 0 | Runs the TypeScript build scripts in `scripts/` |
 | @types/three, @types/node | 0.186.0 / 26.6.5 | dev | 0 | Types |
+| zod | 4.6.7 | dev | 0 (imported only by `scripts/` and `tests/`; build verified zod-free) | Content schema validation (brief §6.1) |
+| opentype.js | 2.0.0 | dev | 0 | Reads glyph outlines from the fonts at build time (brief §7.3) |
+| @fontsource/baloo-2, @fontsource/baloo-thambi-2 | 5.3.0 | dev (font files copied to `public/`) | 0 JS; fonts 19 KB (Latin) + Tamil subset woff2 | Self-hosted OFL fonts named in the brief, already split by script subset |
+| three/examples GLTFLoader + meshopt decoder | (three) | runtime, lazy chunk | ≈21 KB, loaded only when a real GLB exists | Brief §7.3 asset pipeline |
 
 ## Log
 
@@ -26,3 +30,13 @@ Format: date · decision · why · alternative rejected. Every dependency lists 
 - **2026-10-13 · Scope-based tweens.** `src/core/tween.ts` ties every tween, timer and per-frame callback to a `Scope`. Killing a scene's scope drops its pending promises, so `async` sequences stop cleanly instead of animating disposed objects. *Rejected:* a global tween list with cancel-by-id.
 - **2026-10-13 · QA fps probe uses headless Chromium on Metal** (`scripts/probe.ts`, `--use-angle=metal`). The default headless GPU is SwiftShader (CPU) which would make fps numbers meaningless.
 - **2026-10-13 · Git workflow.** Phase 0 is the initial commit on `main`; later phases land on the `mvp` branch, pushed after each phase, then go to `main` through one PR.
+- **2026-10-13 · 3D glyphs: outline JSON + runtime extrusion.** `build-letters.ts` writes compact outlines (`src/data/glyphs.{lang}.json`, ~4 KB per language); the game extrudes them with a 3-segment bevel and caches the geometry. *Rejected:* one GLB per glyph (more files, needs gltf-transform at build time for no visual gain).
+- **2026-10-13 · Every Tamil uyir glyph is one code point.** அ ஆ இ ஈ உ ஊ are U+0B85–U+0B8A, each with its own glyph in Baloo Thambi 2 (glyph #9–#14); no shaping engine needed. `build-letters.ts` fails the build if any future glyph needs more than one code point or is missing from the font.
+- **2026-10-13 · Fonts are subset by script, not to single glyphs.** Fontsource's Latin and Tamil woff2 subsets are shipped as-is: the parent zone needs full readable text in both languages, so subsetting to the 12 lesson glyphs would break it. *Rejected:* `subset-font` (harfbuzz WASM dev dependency) for ~10 KB savings.
+- **2026-10-13 · Stroke box.** Stroke files use a square box centred on the glyph's bounds with 5 % padding (`src/core/glyphBox.ts`); the stroke editor, the trace plot and the 3D glyphs all share it, so authored strokes line up with any font. English strokes were measured from Baloo 2 with scanlines (centre lines of each stem/bowl).
+- **2026-10-13 · Mini-game templates are lazy chunks.** `registry.ts` maps template ids to `import()` factories; the template-id list lives there too, so the zod schema and the `TemplateId` type both derive from it. Adding a 4th template = one id + one factory.
+- **2026-10-13 · Mini-game "stage".** Each template plays on a local frame floating just in front of and above its bud, with the camera 10.5 units away. Nothing in the garden can sit between camera and stage, and the bud/garden stay visible behind it.
+- **2026-10-13 · Placeholder audio is synthesised.** `scripts/make-placeholder-audio.ts` builds the SFX sprite, a 100 bpm loop and a dummy song from oscillators and Karplus-Strong plucks (no samples, no third-party material), encoded to MP3 with ffmpeg. `src/data/audio.json` points at the files, so real audio replaces them without code changes. `cues.en.json` matches the dummy song's bells and must be re-recorded with the Cue Recorder for the real song.
+- **2026-10-13 · VO lookup order.** `{letterId}_{id}` recording → shared `{id}` recording → speechSynthesis (en-IN / ta-IN, rate 0.85). Lines containing `{glyph}`/`{word}` should be recorded per letter (`A_pp_instruction.mp3`) and added to the manifest under that id, per ASSET_PROMPTS §2 ("no stitched VO"). TTS is disabled under `?e2e=1` so tests are deterministic.
+- **2026-10-13 · VO id `thats_a` added** for Basket Match's "That's a fish!" (brief §5.4). Its Tamil text is a placeholder (just the word) and is marked `TODO(content)` + `REVIEW(ta)`.
+- **2026-10-13 · `LetterDef.vo.intro` = the template instruction id** (`pp_instruction` / `tt_instruction` / `bm_instruction`), so one letter can override its instruction line later without code changes.

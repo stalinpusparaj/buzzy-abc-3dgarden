@@ -40,6 +40,7 @@ export class Scope {
   private jobs: Job[] = [];
   private frames = new Set<(dt: number) => void>();
   private children = new Set<Scope>();
+  private killHooks: (() => void)[] = [];
 
   constructor(private readonly parent: Scope | null = null) {}
 
@@ -65,6 +66,11 @@ export class Scope {
   onFrame(fn: (dt: number) => void): () => void {
     this.frames.add(fn);
     return () => this.frames.delete(fn);
+  }
+
+  /** Run `fn` when this scope is killed (e.g. resolve a race when an intro is skipped). */
+  onKill(fn: () => void): void {
+    if (this.alive) this.killHooks.push(fn);
   }
 
   child(): Scope {
@@ -105,6 +111,9 @@ export class Scope {
     for (const c of this.children) c.kill();
     this.children.clear();
     this.parent?.children.delete(this);
+    const hooks = this.killHooks;
+    this.killHooks = [];
+    hooks.forEach((h) => h());
   }
 }
 
