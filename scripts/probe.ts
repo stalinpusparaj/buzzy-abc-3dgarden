@@ -32,8 +32,9 @@ page.on('pageerror', (e) => console.log('[pageerror]', String(e)));
 const cdp = await page.context().newCDPSession(page);
 if (throttle > 1) await cdp.send('Emulation.setCPUThrottlingRate', { rate: throttle });
 await page.goto(url);
+const clickDelay = Number(opt('clickDelay') ?? 1500);
 for (const c of clicks) {
-  await page.waitForTimeout(1500);
+  await page.waitForTimeout(clickDelay);
   const [x, y] = c.split(',').map(Number);
   await page.mouse.click(x ?? 0, y ?? 0);
 }

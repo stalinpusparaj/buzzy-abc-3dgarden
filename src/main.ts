@@ -1,40 +1,52 @@
-import { BoxGeometry, DirectionalLight, HemisphereLight, Mesh } from 'three';
-import { Loop } from './core/loop';
-import { toon } from './core/materials';
-import { createRenderContext } from './core/renderer';
-import { palette } from './core/theme';
-import { createSky } from './entities/Sky';
+import { Game } from './game';
+import { GardenScene } from './scenes/GardenScene';
+import { LetterFlow } from './scenes/LetterFlow';
+import { overviewPose } from './scenes/poses';
+import { installTestHooks } from './testHooks';
+import { LoadingScreen } from './ui/loading';
+import { mountRotatePrompt } from './ui/rotatePrompt';
 import './ui/styles.css';
 
 async function boot(): Promise<void> {
   const host = document.getElementById('app');
-  if (!host) throw new Error('#app missing');
-  const ctx = createRenderContext(host);
-  const { scene, camera, renderer } = ctx;
-
-  scene.add(createSky());
-  scene.add(new HemisphereLight(0xffffff, palette.grass, 1.6));
-  const sun = new DirectionalLight(0xffffff, 1.8);
-  sun.position.set(5, 10, 6);
-  scene.add(sun);
-
-  const cube = new Mesh(new BoxGeometry(1.5, 1.5, 1.5), toon(palette.buzzyBody));
-  scene.add(cube);
-  camera.position.set(0, 2.2, 6);
-  camera.lookAt(0, 0, 0);
-
-  const loop = new Loop(renderer, () => renderer.render(scene, camera));
-  loop.add((dt) => {
-    cube.rotation.x += dt * 0.7;
-    cube.rotation.y += dt * 1.1;
-  });
+  const ui = document.getElementById('ui');
+  if (!host || !ui) throw new Error('#app / #ui missing');
 
   if (__DEV_TOOLS__) {
     const dev = await import('./dev/index');
-    if (dev.readDevMode(location.search) === 'perf') dev.attachPerfOverlay(renderer, loop);
+    const mode = dev.readDevMode(location.search);
+    if (mode === 'strokes' || mode === 'cues') return dev.startTool(mode, ui);
   }
-  loop.start();
+
+  mountRotatePrompt(ui);
+  const loading = new LoadingScreen(ui, null);
+  loading.progress(0.2);
+
+  const g = new Game(host, ui);
+  const garden = new GardenScene(g);
+  g.machine.register('start', { enter: () => g.hud.setMode('hidden'), exit: () => {} });
+  g.machine.register('garden', garden);
+  g.machine.register('letter', new LetterFlow(g));
+  g.machine.register('sing', {
+    enter: () => void g.world.buzzy.celebrate().then(() => g.machine.go('garden', undefined)),
+    exit: () => {},
+  });
+  installTestHooks(g, { targets: () => [] });
+
+  g.machine.go('start', undefined);
+  g.rig.set(overviewPose(g.aspect));
+  g.loop.start();
+  if (__DEV_TOOLS__) {
+    const dev = await import('./dev/index');
+    if (dev.readDevMode(location.search) === 'perf') dev.attachPerfOverlay(g.rc.renderer, g.loop);
+  }
+  loading.progress(1);
   document.body.dataset.ready = '1';
+
+  await loading.waitForStart();
+  g.audio.unlock();
+  loading.hide();
+  g.machine.go('garden', undefined);
 }
 
 void boot();

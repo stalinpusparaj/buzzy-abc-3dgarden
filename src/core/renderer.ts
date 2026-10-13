@@ -11,8 +11,8 @@ export interface RenderContext {
 }
 
 /** WebGL2 only (brief §7.1: no WebGPU for MVP). Throws if WebGL2 is unavailable. */
-export function createRenderContext(host: HTMLElement): RenderContext {
-  const renderer = new WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+export function createRenderContext(host: HTMLElement, antialias = true): RenderContext {
+  const renderer = new WebGLRenderer({ antialias, powerPreference: 'high-performance' });
   renderer.domElement.id = 'game-canvas';
   host.appendChild(renderer.domElement);
 

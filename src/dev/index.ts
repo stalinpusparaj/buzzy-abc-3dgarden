@@ -12,3 +12,8 @@ export function readDevMode(search: string): DevMode | null {
 }
 
 export { attachPerfOverlay } from './perfOverlay';
+
+/** Full-page dev tools (stroke editor, cue recorder) replace the game. Built in Phase 3. */
+export function startTool(mode: 'strokes' | 'cues', root: HTMLElement): void {
+  root.textContent = `${mode} tool: coming in Phase 3`;
+}

@@ -14,7 +14,15 @@ export default defineConfig({
     // The production build is served under a subpath to prove dist/ is relocatable.
     baseURL: `http://localhost:${PORT}/play/`,
     viewport: { width: 1280, height: 720 },
-    launchOptions: { args: ['--autoplay-policy=no-user-gesture-required'] },
+    launchOptions: {
+      // On macOS use the real GPU (Metal) so fps checks mean something; elsewhere SwiftShader.
+      args: [
+        '--autoplay-policy=no-user-gesture-required',
+        ...(process.platform === 'darwin'
+          ? ['--use-angle=metal', '--enable-gpu', '--ignore-gpu-blocklist']
+          : []),
+      ],
+    },
   },
   webServer: {
     command: 'npm run build && npm run preview',

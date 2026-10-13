@@ -21,7 +21,7 @@ export function createSky(radius = 300): Mesh {
       uniform vec3 bottom;
       varying float vH;
       void main() {
-        float k = smoothstep(-0.15, 0.6, vH);
+        float k = smoothstep(-0.85, 0.05, vH);
         gl_FragColor = vec4(mix(bottom, top, k), 1.0);
         #include <colorspace_fragment>
       }`,
