@@ -28,6 +28,7 @@ export interface TestApi {
   wrongTargets(): { x: number; y: number }[];
   cueLog(): { id: string; expected: number; actual: number }[];
   audioState(): string;
+  songDuration(): number;
   /** On-screen size (CSS px) of each bud's visual bounds and its hit collider. */
   tapTargets(): { id: string; visualW: number; visualH: number; collider: number }[];
 }
@@ -84,6 +85,7 @@ export function installTestHooks(g: Game): void {
     wrongTargets: () => g.wrongTargets().map((p) => toScreen(g, p)),
     cueLog: () => [...g.cueLog],
     audioState: () => g.audio.ctx?.state ?? 'none',
+    songDuration: () => g.songDuration,
     fps: () => (frames.length ? 1000 / (frames.reduce((a, b) => a + b, 0) / frames.length) : 0),
     tier: () => g.quality.tier,
     bloomed: () => [...g.storage.get().bloomed],
@@ -106,4 +108,6 @@ export function installTestHooks(g: Game): void {
       }),
   };
   (window as Window & { __buzzy?: TestApi }).__buzzy = api;
+  // Lets the audio e2e test mimic a Safari system suspension.
+  Object.defineProperty(window, '__buzzyAudioCtx', { get: () => g.audio.ctx });
 }

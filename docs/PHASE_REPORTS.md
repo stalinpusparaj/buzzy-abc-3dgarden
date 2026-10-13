@@ -38,3 +38,16 @@
 8. Stubbed: VO is speechSynthesis (en-IN / ta-IN); SFX, music and the song are synthesised placeholders; 3D props are primitive placeholders.
 9. Risk: English stroke centre lines were measured from the font, but stroke *order* follows common uppercase practice; check it against the scheme your schools teach.
 10. Risk: placeholder props are recognisable but crude; Basket Match leans on them most, so it benefits first from the Phase 6 GLBs.
+
+## Phase 3: Audio and sing-along (2026-10-13)
+
+1. ✅ With the dummy song, all 6 cues fire 11 ms after their timestamps (limit 50 ms). Timing runs on the AudioContext clock, so it can't drift from the music (e2e).
+2. ✅ The Cue Recorder (`/?dev=cues`) exports JSON that passes the same zod schema the build uses (unit test + browser check).
+3. ✅ Audio suspends when the tab is hidden and resumes when it returns, in Chromium **and WebKit** (Safari's engine). A system-suspended context, like iOS after a call, resumes on the next touch (e2e + unit tests).
+4. ✅ Music / VO / SFX buses; music ducks to 0.12 under VO, scaled by the parent's music volume (unit test). One SFX sprite, one background loop per language, VO and sung lines queued so they never overlap.
+5. ✅ Sing-along: the camera follows a Catmull-Rom rail keyed to the cue times, Buzzy leaves early so she lands on the beat, and each bud bounces, flashes and shows its big glyph + object. No karaoke text. The home icon is always visible.
+6. ✅ Stroke Editor (`/?dev=strokes`) is live (built in Phase 2 to author the English strokes). Both dev tools now use a stylesheet instead of inline styles, so they also work under the Phase 5 CSP in QA builds.
+7. Stubbed: the song, loop and SFX are synthesised placeholders; `cues.en.json` matches the dummy song and must be re-recorded for the real one.
+8. Risk: this is not a real iPhone. WebKit on macOS exercises the same Web Audio code, but iOS-only behaviours (silent switch, Low Power Mode, AirPods hand-off) need the Phase 7 device check.
+9. Risk: the full song plays on the VO bus (volume 1.0), so the parent's "Voice" slider also sets song volume. Simple, but worth knowing.
+10. Risk: speechSynthesis voices vary a lot between devices (many Androids have no ta-IN voice). The chime fallback works, but recorded VO is what makes the Tamil experience good.

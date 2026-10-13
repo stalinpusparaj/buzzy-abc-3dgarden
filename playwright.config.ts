@@ -36,5 +36,15 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 720 } },
     },
+    // Safari's engine: boot + audio lifecycle (the iOS-sensitive parts).
+    {
+      name: 'webkit',
+      testMatch: /(smoke|audio)\.spec\.ts/,
+      use: {
+        ...devices['Desktop Safari'],
+        viewport: { width: 1280, height: 720 },
+        launchOptions: { args: [] },
+      },
+    },
   ],
 });

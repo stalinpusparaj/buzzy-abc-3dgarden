@@ -49,6 +49,8 @@ export class Game {
   lang: Lang;
   /** Sing-along cue firings (song time vs cue time), for the timing test. */
   readonly cueLog: { id: string; expected: number; actual: number }[] = [];
+  /** Duration of the last song the sing-along decoded (0 = no audio), for tests. */
+  songDuration = 0;
   /** Test hooks: hints fired, and the world points the current activity wants touched. */
   hintCount = 0;
   private targetsFn: () => Vector3[] = () => [];

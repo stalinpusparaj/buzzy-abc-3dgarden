@@ -50,6 +50,7 @@ export class SingAlong implements GameState<void> {
     const cues = CUES[g.lang]
       .map((c) => ({ ...c, bud: g.world.bud(c.id) }))
       .filter((c): c is Cue & { bud: Bud } => !!c.bud);
+    g.songDuration = buf?.duration ?? 0;
     const duration = buf?.duration ?? (cues.at(-1)?.t ?? 0) + 4;
     const v = buf ? g.audio.play(buf, 'vo') : null;
     // Song time comes from the AudioContext clock when we have it.
