@@ -3,6 +3,9 @@ import {
   closest,
   coverage,
   createTrace,
+  doneAt,
+  END_REACH,
+  nearestPlaces,
   pointAt,
   polyline,
   step,
@@ -54,6 +57,22 @@ describe('polyline helpers', () => {
     ]);
     expect(closest(pl, [0.9, 0.1], 0, 0.5)?.s).toBeCloseTo(0.5);
   });
+  it('nearestPlaces finds each stretch of trail beside the finger, never a window edge', () => {
+    // A hairpin: up x = 0.4, across, down x = 0.6. A finger between the legs is beside both.
+    const pl = polyline([
+      [0.4, 0],
+      [0.4, 1],
+      [0.6, 1],
+      [0.6, 0],
+    ]);
+    const places = nearestPlaces(pl, [0.5, 0.5], 0, pl.length);
+    const near = (a: number, b: number): boolean => Math.abs(a - b) < 1e-9;
+    expect(places.map((h) => h.s)).toEqual([0.5, 1.1, 1.7].map((x) => expect.closeTo(x)));
+    expect(places.map((h) => h.d).every((d, k) => near(d, [0.1, 0.5, 0.1][k]!))).toBe(true);
+    // Windowed: true minima only, unless clipped (then the window edge counts).
+    expect(nearestPlaces(pl, [0.5, 0.5], 0, 0.3)).toEqual([]);
+    expect(nearestPlaces(pl, [0.5, 0.5], 0, 0.3, true).map((h) => h.s)).toEqual([0.3]);
+  });
 });
 
 describe('trace rules', () => {
@@ -103,6 +122,27 @@ describe('trace rules', () => {
     expect(st.progress[0]).toBe(mid);
   });
 
+  it('taking hold earns nothing; a touch just ahead of Buzzy then catches up', () => {
+    const st = createTrace(3);
+    const pl = lines[0]!;
+    expect(step(lines, st, pointAt(pl, 0.5 * cfg.tolerance), cfg)).toBe(null);
+    expect(st.onPath).toBe(true);
+    expect(st.progress[0]).toBe(0);
+    for (const p of walk(0, (0.5 * cfg.tolerance) / pl.length, 0.5)) step(lines, st, p, cfg);
+    expect(st.progress[0]! / pl.length).toBeCloseTo(0.5);
+  });
+
+  it('after leaving the path the finger must come back to Buzzy', () => {
+    const st = createTrace(3);
+    for (const p of walk(0, 0, 0.4)) step(lines, st, p, cfg);
+    const before = st.progress[0]!;
+    expect(step(lines, st, [0.95, 0.95], cfg)).toBe('offPath');
+    for (const p of walk(0, 0.6, 0.9)) step(lines, st, p, cfg); // back on, but further along
+    expect(st.progress[0]).toBe(before);
+    for (const p of walk(0, 0.4, 1)) step(lines, st, p, cfg); // from Buzzy: fine
+    expect(st.stroke).toBe(1);
+  });
+
   it('strokes must be done in order', () => {
     const st = createTrace(3);
     for (const p of walk(2, 0, 1)) step(lines, st, p, cfg); // the crossbar first: ignored
@@ -110,11 +150,20 @@ describe('trace rules', () => {
     expect(st.stroke).toBe(0);
   });
 
-  it('a stroke completes at 85 % coverage and the letter after the last stroke', () => {
+  it('a stroke completes at its end star (within a tolerance), the letter after the last', () => {
     const st = createTrace(3);
     const events: string[] = [];
     for (let i = 0; i < 3; i++) {
-      for (const p of walk(i, 0, 0.88)) {
+      const len = lines[i]!.length;
+      const at = doneAt(lines[i]!, cfg) / len;
+      expect(at).toBeGreaterThanOrEqual(0.85);
+      expect(1 - at).toBeLessThanOrEqual(cfg.tolerance / len + 1e-9);
+      // Stopping short of that leaves the stroke open...
+      const short = at - (0.3 * cfg.tolerance) / len;
+      for (const p of walk(i, 0, short)) step(lines, st, p, cfg);
+      expect(st.stroke).toBe(i);
+      // ...carrying on to it (still short of the very end) finishes it.
+      for (const p of walk(i, short, at + 0.01, 10)) {
         const e = step(lines, st, p, cfg);
         if (e === 'strokeDone' || e === 'letterDone') events.push(e);
       }
@@ -122,6 +171,37 @@ describe('trace rules', () => {
     expect(events).toEqual(['strokeDone', 'strokeDone', 'letterDone']);
     expect(st.done).toBe(true);
     expect(coverage(lines, st)).toBe(1);
+  });
+
+  it('a long stroke is not done at 85 %: the child must reach the end star', () => {
+    // A Tamil-like stroke 2.4 long: its last 15 % (0.36) is a whole bar.
+    const long = [
+      polyline([
+        [0.1, 0.1],
+        [0.9, 0.1],
+        [0.9, 0.9],
+        [0.1, 0.9],
+      ]),
+    ];
+    const pl = long[0]!;
+    const st = createTrace(1);
+    const along = (a: number, b: number): Pt[] =>
+      Array.from({ length: 121 }, (_, k) => pointAt(pl, a + ((b - a) * k) / 120));
+    for (const p of along(0, 0.9 * pl.length)) step(long, st, p, cfg);
+    expect(st.done).toBe(false);
+    expect(st.progress[0]! / pl.length).toBeGreaterThan(0.89);
+    // Done with the finger on the end star: at most a tolerance (and END_REACH) from the end.
+    expect(doneAt(pl, cfg)).toBeCloseTo(pl.length - Math.min(cfg.tolerance, END_REACH));
+    for (const p of along(0.9 * pl.length, pl.length)) step(long, st, p, cfg);
+    expect(st.done).toBe(true);
+  });
+
+  it('a short stroke still needs 85 % coverage', () => {
+    const pl = polyline([
+      [0.4, 0.5],
+      [0.6, 0.5],
+    ]);
+    expect(doneAt(pl, cfg)).toBeCloseTo(0.85 * pl.length);
   });
 
   it('a dot stroke completes when touched within tolerance (e.g. the dots of ஈ)', () => {

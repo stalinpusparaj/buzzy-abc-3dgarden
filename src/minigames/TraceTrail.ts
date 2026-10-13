@@ -1,17 +1,21 @@
 import { Group, Plane, Vector3 } from 'three';
+import { motion } from '../core/a11y';
 import type { GamePointerEvent } from '../core/input';
 import { palette } from '../core/theme';
 import { loadStrokes } from '../data/strokes';
 import type { LetterDef } from '../data/types';
 import { outline } from '../entities/Glyph3D';
-import { squash } from '../entities/juice';
+import { popIn } from '../entities/juice';
 import { TracePlot } from '../entities/TracePlot';
 import { Hint } from './hint';
 import type { GameContext, MiniGame } from './MiniGame';
+import { perch } from './perch';
 import {
   createTrace,
+  liftFinger,
   pointAt,
   polyline,
+  sampleStep,
   step,
   traceConfig,
   type Polyline,
@@ -20,9 +24,15 @@ import {
   type TraceState,
 } from './traceMath';
 
+/** Buzzy's size while tracing (smaller than other games: she must not hide the guide). */
+const BUZZY_SCALE = 0.38;
+/** Buzzy hovers this high above the plot (local z). */
+const HOVER = 0.8;
+
 /**
- * Template B, Trace the Trail (brief §5.3). Buzzy sits on the start dot and follows the
- * finger only while it stays on the current stroke; covered parts fill with pollen.
+ * Template B, Trace the Trail (brief §5.3). A follow-me sparkle shows each stroke from its
+ * green start to its end star; chevrons point the way. Buzzy hovers beside the finger
+ * (never over the guide) while it stays on the current stroke; covered parts fill with pollen.
  */
 export class TraceTrail implements MiniGame {
   readonly id = 'traceTrail' as const;
@@ -36,6 +46,7 @@ export class TraceTrail implements MiniGame {
   private hint: Hint | null = null;
   private last: Pt | null = null;
   private pulse = 0;
+  private side: number | null = null;
   private readonly plane = new Plane();
 
   async enter(ctx: GameContext, letter: LetterDef): Promise<void> {
@@ -49,13 +60,15 @@ export class TraceTrail implements MiniGame {
       return;
     }
     this.lines = strokes.strokes.map((s) => polyline(s));
-    const size = Math.max(o.bbox[2]! - o.bbox[0]!, o.bbox[3]! - o.bbox[1]!) / 0.9;
-    this.cfg = traceConfig((o.bbox[3]! - o.bbox[1]!) / size, ctx.older);
+    const [w, h] = [o.bbox[2]! - o.bbox[0]!, o.bbox[3]! - o.bbox[1]!];
+    const size = Math.max(w, h) / 0.9;
+    this.cfg = traceConfig(h / size, ctx.older);
     this.st = createTrace(this.lines.length);
     const color =
       palette.petals[(letter.id.charCodeAt(letter.id.length - 1) + 2) % palette.petals.length] ??
       0xff8fa3;
-    this.plot = new TracePlot(ctx.lang, letter.glyph, this.lines, color);
+    // A wide letter lies bigger on a wider plot (its stroke box stays the same).
+    this.plot = new TracePlot(ctx.lang, letter.glyph, this.lines, color, [w / size, h / size]);
     // Lie the plot back like a garden bed seen from the close-up camera.
     this.tilt.rotation.x = -0.5;
     this.tilt.position.set(0, -0.2, 0);
@@ -64,28 +77,44 @@ export class TraceTrail implements MiniGame {
     ctx.stage.updateMatrixWorld(true);
     this.hint = new Hint(() => this.showHint());
     ctx.setTargets(() => this.plot?.strokePoints(this.st?.stroke ?? 0) ?? []);
+    void ctx.buzzy.setScale(BUZZY_SCALE);
     void ctx.buzzy.flyTo(this.buzzyPoint(), 1.0);
     void ctx.voice.say(letter.vo.intro, { glyph: letter.glyph, letterId: letter.id });
+    this.demoSoon(1.2);
   }
 
-  /** World position for Buzzy: on the trail at the current progress. */
+  /** World position for Buzzy: hovering beside the current progress point, off the guide. */
   private buzzyPoint(): Vector3 {
     const plot = this.plot;
     const st = this.st;
     const pl = st ? this.lines[st.stroke] : undefined;
     if (!plot || !st || !pl) return this.ctx?.buzzy.position.clone() ?? new Vector3();
-    const [u, v] = pointAt(pl, st.progress[st.stroke] ?? 0);
-    return plot.root.localToWorld(plot.local(u, v, 1.1));
+    const spot = perch(pointAt(pl, st.progress[st.stroke] ?? 0), plot.avoid(), this.side);
+    this.side = spot.angle;
+    return plot.root.localToWorld(plot.local(spot.pt[0], spot.pt[1], HOVER));
+  }
+
+  /** Show the current stroke with the follow-me sparkle (unless the child is already on it). */
+  private demoSoon(delay: number): void {
+    const ctx = this.ctx;
+    if (!ctx) return;
+    const stroke = this.st?.stroke;
+    void ctx.scope.wait(delay).then(() => {
+      const st = this.st;
+      if (!st || st.done || st.stroke !== stroke || (st.onPath && ctx.input.isDown)) return;
+      this.plot?.playDemo(motion.reduced);
+    });
   }
 
   update(dt: number): void {
-    if (!this.plot || !this.st) return;
+    const ctx = this.ctx;
+    if (!this.plot || !this.st || !ctx) return;
     this.hint?.update(dt);
     this.pulse = Math.max(0, this.pulse - dt);
-    const k =
-      1 +
-      (this.pulse > 0 || !this.st.onPath ? 0.25 * Math.abs(Math.sin(performance.now() / 160)) : 0);
-    this.plot.startDot.scale.setScalar(k);
+    const tracing = this.st.onPath && ctx.input.isDown;
+    const f = { tracing, strong: this.pulse > 0, reduced: motion.reduced };
+    // After each follow-me run, the start ball bounces: "now you!"
+    if (this.plot.update(dt, f)) this.pulse = Math.max(this.pulse, 1.8);
   }
 
   onPointer(e: GamePointerEvent): void {
@@ -95,7 +124,9 @@ export class TraceTrail implements MiniGame {
     const cfg = this.cfg;
     if (!ctx || !plot || !st || !cfg || st.done) return;
     if (e.type === 'up' || e.type === 'cancel') {
+      // The finger left the screen: the next touch must take hold on Buzzy again.
       this.last = null;
+      liftFinger(st);
       return;
     }
     if (e.type === 'move' && !ctx.input.isDown) return;
@@ -109,7 +140,7 @@ export class TraceTrail implements MiniGame {
     const from = this.last ?? p;
     const steps = Math.max(
       1,
-      Math.ceil(Math.hypot(p[0] - from[0], p[1] - from[1]) / (cfg.tolerance / 2)),
+      Math.ceil(Math.hypot(p[0] - from[0], p[1] - from[1]) / sampleStep(cfg)),
     );
     for (let i = 1; i <= steps; i++) {
       const q: Pt = [
@@ -134,6 +165,7 @@ export class TraceTrail implements MiniGame {
     }
     this.hint?.progress();
     plot.setProgress(st);
+    plot.stopDemo();
     if (ev === 'advanced') {
       ctx.buzzy.follow(this.buzzyPoint());
       return;
@@ -144,8 +176,10 @@ export class TraceTrail implements MiniGame {
     if (end) ctx.particles.burst(end, 30);
     plot.setStroke(st.stroke);
     if (ev === 'strokeDone') {
-      void squash(ctx.scope, plot.startDot, 0.3);
+      this.side = null;
+      void popIn(ctx.scope, plot.startMarker, 1, 0.45, 0.15);
       void ctx.buzzy.flyTo(this.buzzyPoint(), 0.6);
+      this.demoSoon(0.7);
       return;
     }
     for (let i = 0; i < this.lines.length; i++) {
@@ -160,7 +194,8 @@ export class TraceTrail implements MiniGame {
     if (!ctx || !plot || this.st?.done) return;
     ctx.onHint();
     this.pulse = 2.5;
-    void ctx.buzzy.point(plot.startDot.getWorldPosition(new Vector3()));
+    plot.playDemo(motion.reduced);
+    void ctx.buzzy.point(plot.startMarker.getWorldPosition(new Vector3()));
   }
 
   exit(): void {
