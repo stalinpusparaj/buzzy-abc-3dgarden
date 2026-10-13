@@ -1,0 +1,52 @@
+:root {
+  --ink: #2b2233;
+  --paper: #fffaf0;
+  --accent: #ff8fa3;
+  --focus: #2f6fd6;
+  --sky: #8ed1fc;
+  --sky2: #e0f4ff;
+  --font: 'Baloo 2', 'Baloo Thambi 2', system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  overflow: hidden;
+  background: linear-gradient(var(--sky), var(--sky2));
+  font-family: var(--font);
+  color: var(--ink);
+  /* P2: tap and drag only. No pinch-zoom, no long-press callouts, no text selection. */
+  touch-action: none;
+  overscroll-behavior: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+#app {
+  position: fixed;
+  inset: 0;
+}
+
+#app canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  touch-action: none;
+}
+
+#ui {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+#ui > * {
+  pointer-events: auto;
+}

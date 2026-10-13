@@ -1,0 +1,12 @@
+dist
+dist-qa
+dev-dist
+node_modules
+test-results
+playwright-report
+public
+docs
+tests/e2e/**/*-snapshots
+src/data/glyphs.*.json
+package-lock.json
+*.md

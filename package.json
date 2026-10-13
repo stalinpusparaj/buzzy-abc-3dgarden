@@ -1,0 +1,44 @@
+{
+  "name": "buzzy-abc-garden",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Buzzy ABC Garden: a browser-based 3D letter-learning game for ages 3-6 (English + Tamil).",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "tsx scripts/validate-data.ts && tsc --noEmit -p tsconfig.json && vite build",
+    "preview": "vite preview --base /play/ --port 4173 --strictPort",
+    "test": "vitest run",
+    "e2e": "playwright test",
+    "lint": "eslint . && prettier --check .",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tsconfig.node.json",
+    "budgets": "tsx scripts/check-budgets.ts",
+    "ci": "npm run lint && npm run typecheck && npm test && npm run build && npm run budgets && npm run e2e",
+    "build:qa": "tsx scripts/validate-data.ts && vite build --mode qa"
+  },
+  "dependencies": {
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.64.0",
+    "@types/node": "26.6.5",
+    "@types/three": "0.186.0",
+    "eslint": "10.12.0",
+    "eslint-config-prettier": "10.1.8",
+    "globals": "17.13.0",
+    "prettier": "3.9.10",
+    "tsx": "4.23.15",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.71.2",
+    "vite": "8.3.4",
+    "vite-plugin-pwa": "2.0.0",
+    "vitest": "5.0.4",
+    "workbox-build": "7.4.1",
+    "workbox-window": "7.4.1"
+  }
+}
