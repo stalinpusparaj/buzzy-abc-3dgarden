@@ -13,7 +13,7 @@ import { disposeObject } from '../core/dispose';
 import { ownToon, toon } from '../core/materials';
 import { palette } from '../core/theme';
 import type { Lang } from '../data/types';
-import { pointAt, type Polyline, type TraceState } from '../minigames/traceMath';
+import { DOT_LENGTH, pointAt, type Polyline, type TraceState } from '../minigames/traceMath';
 import { glyphGeometry } from './Glyph3D';
 
 /** World units per stroke-box unit. */
@@ -99,6 +99,8 @@ export class TracePlot {
     const a = pointAt(pl, 0);
     const b = pointAt(pl, Math.min(pl.length, 0.12));
     this.startDot.position.copy(this.local(a[0], a[1], 0.45));
+    // A dot stroke has no direction: show the start dot only.
+    this.arrow.visible = pl.length >= DOT_LENGTH;
     const dir = new Vector3(b[0] - a[0], b[1] - a[1], 0).normalize();
     this.arrow.position.copy(this.local(a[0], a[1], 0.45)).addScaledVector(dir, 0.75);
     this.arrow.quaternion.copy(new Quaternion().setFromUnitVectors(new Vector3(0, 1, 0), dir));

@@ -28,6 +28,9 @@ export interface TraceState {
 
 export type TraceEvent = 'advanced' | 'offPath' | 'strokeDone' | 'letterDone' | null;
 
+/** A stroke shorter than this is a dot (e.g. the two dots of ஈ): touching it completes it. */
+export const DOT_LENGTH = 0.03;
+
 /** Brief §5.3 defaults: 12 % of glyph height (ages 3–4) or 8 % ("older child"). */
 export function traceConfig(glyphHeight: number, older: boolean): TraceConfig {
   return { tolerance: glyphHeight * (older ? 0.08 : 0.12), maxJump: 0.15, complete: 0.85 };
@@ -99,6 +102,15 @@ export function step(lines: Polyline[], st: TraceState, p: Pt, cfg: TraceConfig)
   if (st.done) return null;
   const pl = lines[st.stroke];
   if (!pl) return null;
+  if (pl.length < DOT_LENGTH) {
+    const c = pl.pts[0] ?? [0, 0];
+    if (Math.hypot(p[0] - c[0], p[1] - c[1]) > cfg.tolerance) {
+      const was = st.onPath;
+      st.onPath = false;
+      return was ? 'offPath' : null;
+    }
+    return finishStroke(lines, st, pl);
+  }
   const s0 = st.progress[st.stroke] ?? 0;
   const hit = closest(pl, p, Math.max(0, s0 - cfg.tolerance), s0 + cfg.maxJump * pl.length);
   if (!hit || hit.d > cfg.tolerance) {
@@ -109,21 +121,24 @@ export function step(lines: Polyline[], st: TraceState, p: Pt, cfg: TraceConfig)
   st.onPath = true;
   if (hit.s <= s0) return null;
   st.progress[st.stroke] = hit.s;
-  if (hit.s >= cfg.complete * pl.length) {
-    st.progress[st.stroke] = pl.length;
-    st.stroke++;
-    st.onPath = false;
-    if (st.stroke >= lines.length) {
-      st.done = true;
-      return 'letterDone';
-    }
-    return 'strokeDone';
-  }
+  if (hit.s >= cfg.complete * pl.length) return finishStroke(lines, st, pl);
   return 'advanced';
+}
+
+function finishStroke(lines: Polyline[], st: TraceState, pl: Polyline): TraceEvent {
+  st.progress[st.stroke] = pl.length;
+  st.stroke++;
+  st.onPath = false;
+  if (st.stroke >= lines.length) {
+    st.done = true;
+    return 'letterDone';
+  }
+  return 'strokeDone';
 }
 
 /** Overall completion 0..1 across all strokes. */
 export function coverage(lines: Polyline[], st: TraceState): number {
+  if (st.done) return 1;
   const total = lines.reduce((a, l) => a + l.length, 0);
   const done = lines.reduce((a, l, i) => a + Math.min(st.progress[i] ?? 0, l.length), 0);
   return total > 0 ? done / total : 0;

@@ -123,4 +123,23 @@ describe('trace rules', () => {
     expect(st.done).toBe(true);
     expect(coverage(lines, st)).toBe(1);
   });
+
+  it('a dot stroke completes when touched within tolerance (e.g. the dots of ஈ)', () => {
+    const dotLines = [
+      polyline([
+        [0.2, 0.2],
+        [0.2, 0.8],
+      ]),
+      polyline([
+        [0.6, 0.5],
+        [0.6, 0.5],
+      ]),
+    ];
+    const st = createTrace(2);
+    expect(step(dotLines, st, [0.6, 0.5], cfg)).toBe(null); // stroke order still applies
+    for (let k = 0; k <= 30; k++) step(dotLines, st, [0.2, 0.2 + (0.6 * k) / 30], cfg);
+    expect(st.stroke).toBe(1);
+    expect(step(dotLines, st, [0.9, 0.9], cfg)).toBe(null);
+    expect(step(dotLines, st, [0.62, 0.52], cfg)).toBe('letterDone');
+  });
 });

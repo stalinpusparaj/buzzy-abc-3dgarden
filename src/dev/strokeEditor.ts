@@ -75,6 +75,28 @@ export function startStrokeEditor(root: HTMLElement): void {
     g.beginPath();
     pts.forEach((p, i) => (i ? g.lineTo(...toPx(p)) : g.moveTo(...toPx(p))));
     g.stroke();
+    // Direction arrowheads at 1/3, 2/3 and the end of the stroke.
+    const px = pts.map(toPx);
+    const seg = px.slice(1).map((p, i) => Math.hypot(p[0] - px[i]![0], p[1] - px[i]![1]));
+    const total = seg.reduce((a, b) => a + b, 0);
+    for (const f of [1 / 3, 2 / 3, 0.999]) {
+      let d = total * f;
+      let i = 0;
+      while (i < seg.length - 1 && d > seg[i]!) d -= seg[i++]!;
+      const a = px[i]!;
+      const b = px[i + 1];
+      if (!b || !seg[i]) continue;
+      const k = d / seg[i]!;
+      const x = a[0] + (b[0] - a[0]) * k;
+      const y = a[1] + (b[1] - a[1]) * k;
+      const ang = Math.atan2(b[1] - a[1], b[0] - a[0]);
+      g.fillStyle = color;
+      g.beginPath();
+      g.moveTo(x + Math.cos(ang) * 11, y + Math.sin(ang) * 11);
+      g.lineTo(x + Math.cos(ang + 2.5) * 11, y + Math.sin(ang + 2.5) * 11);
+      g.lineTo(x + Math.cos(ang - 2.5) * 11, y + Math.sin(ang - 2.5) * 11);
+      g.fill();
+    }
     const [sx, sy] = toPx(pts[0] as [number, number]);
     g.fillStyle = '#3ccf4e';
     g.beginPath();
