@@ -188,5 +188,89 @@
     "textEn": "F",
     "textTa": "",
     "_note": "TODO(content): record the letter's sound; TTS placeholder says the letter name"
+  },
+  "ta_a_isfor": {
+    "en": "",
+    "ta": "",
+    "textEn": "",
+    "textTa": "அ, அணில்!",
+    "_note": "REVIEW(ta): word, glyph and VO to be verified against the Tamil Nadu primer"
+  },
+  "ta_a_sound": {
+    "en": "",
+    "ta": "",
+    "textEn": "",
+    "textTa": "அ",
+    "_note": "TODO(content): record the vowel sound. REVIEW(ta): word, glyph and VO to be verified against the Tamil Nadu primer"
+  },
+  "ta_aa_isfor": {
+    "en": "",
+    "ta": "",
+    "textEn": "",
+    "textTa": "ஆ, ஆடு!",
+    "_note": "REVIEW(ta): word, glyph and VO to be verified against the Tamil Nadu primer"
+  },
+  "ta_aa_sound": {
+    "en": "",
+    "ta": "",
+    "textEn": "",
+    "textTa": "ஆ",
+    "_note": "TODO(content): record the vowel sound. REVIEW(ta): word, glyph and VO to be verified against the Tamil Nadu primer"
+  },
+  "ta_i_isfor": {
+    "en": "",
+    "ta": "",
+    "textEn": "",
+    "textTa": "இ, இலை!",
+    "_note": "REVIEW(ta): word, glyph and VO to be verified against the Tamil Nadu primer"
+  },
+  "ta_i_sound": {
+    "en": "",
+    "ta": "",
+    "textEn": "",
+    "textTa": "இ",
+    "_note": "TODO(content): record the vowel sound. REVIEW(ta): word, glyph and VO to be verified against the Tamil Nadu primer"
+  },
+  "ta_ii_isfor": {
+    "en": "",
+    "ta": "",
+    "textEn": "",
+    "textTa": "ஈ, ஈ!",
+    "_note": "REVIEW(ta): word, glyph and VO to be verified against the Tamil Nadu primer"
+  },
+  "ta_ii_sound": {
+    "en": "",
+    "ta": "",
+    "textEn": "",
+    "textTa": "ஈ",
+    "_note": "TODO(content): record the vowel sound. REVIEW(ta): word, glyph and VO to be verified against the Tamil Nadu primer"
+  },
+  "ta_u_isfor": {
+    "en": "",
+    "ta": "",
+    "textEn": "",
+    "textTa": "உ, உரல்!",
+    "_note": "REVIEW(ta): word, glyph and VO to be verified against the Tamil Nadu primer"
+  },
+  "ta_u_sound": {
+    "en": "",
+    "ta": "",
+    "textEn": "",
+    "textTa": "உ",
+    "_note": "TODO(content): record the vowel sound. REVIEW(ta): word, glyph and VO to be verified against the Tamil Nadu primer"
+  },
+  "ta_uu_isfor": {
+    "en": "",
+    "ta": "",
+    "textEn": "",
+    "textTa": "ஊ, ஊஞ்சல்!",
+    "_note": "REVIEW(ta): word, glyph and VO to be verified against the Tamil Nadu primer"
+  },
+  "ta_uu_sound": {
+    "en": "",
+    "ta": "",
+    "textEn": "",
+    "textTa": "ஊ",
+    "_note": "TODO(content): record the vowel sound. REVIEW(ta): word, glyph and VO to be verified against the Tamil Nadu primer"
   }
 }

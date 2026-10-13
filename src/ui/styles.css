@@ -273,3 +273,36 @@ body {
     animation-iteration-count: 1 !important;
   }
 }
+
+/* Language toggle: both scripts always visible, the active one big and bold. */
+#btn-lang {
+  width: 104px;
+  border-radius: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  font: 700 26px/1 var(--font);
+  color: #3b2a20;
+}
+#btn-lang .l-sep {
+  opacity: 0.35;
+}
+#btn-lang .l-en,
+#btn-lang .l-ta {
+  opacity: 0.45;
+  transition:
+    transform 0.2s,
+    opacity 0.2s;
+}
+#btn-lang .l-ta {
+  font-family: 'Baloo Thambi 2', var(--font);
+}
+#btn-lang[data-lang='en'] .l-en,
+#btn-lang[data-lang='ta'] .l-ta {
+  opacity: 1;
+  transform: scale(1.25);
+}
+#hud[data-mode='activity'] #btn-lang {
+  display: none;
+}

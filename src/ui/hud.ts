@@ -8,10 +8,12 @@ export class Hud {
   readonly home: HTMLButtonElement;
   readonly mute: HTMLButtonElement;
   readonly skip: HTMLButtonElement;
+  readonly lang: HTMLButtonElement;
   readonly topRight: HTMLElement;
   onHome: () => void = () => {};
   onSkip: () => void = () => {};
   onMute: (muted: boolean) => void = () => {};
+  onLang: () => void = () => {};
   private muted = false;
 
   constructor(root: HTMLElement) {
@@ -22,11 +24,18 @@ export class Hud {
     this.mute = iconButton('btn-mute', icons.soundOn, 'Sound on or off');
     this.skip = iconButton('btn-skip', icons.skip, 'Skip');
     this.skip.hidden = true;
+    // Brief Phase 4: a big "A / அ" toggle on the garden HUD.
+    this.lang = iconButton(
+      'btn-lang',
+      '<span class="l-en">A</span><span class="l-sep">/</span><span class="l-ta">அ</span>',
+      'English or Tamil',
+    );
     this.topRight = document.createElement('div');
     this.topRight.className = 'hud-tr';
     const topLeft = document.createElement('div');
     topLeft.className = 'hud-tl';
     topLeft.append(this.home, this.mute);
+    this.topRight.append(this.lang);
     this.el.append(topLeft, this.topRight, this.skip);
     root.appendChild(this.el);
 
@@ -48,6 +57,7 @@ export class Hud {
     press(this.home, () => this.onHome());
     press(this.skip, () => this.onSkip());
     press(this.mute, () => this.setMuted(!this.muted, true));
+    press(this.lang, () => this.onLang());
   }
 
   setMode(mode: HudMode): void {
@@ -57,6 +67,10 @@ export class Hud {
 
   showSkip(on: boolean): void {
     this.skip.hidden = !on;
+  }
+
+  setLang(lang: 'en' | 'ta'): void {
+    this.lang.dataset.lang = lang;
   }
 
   setMuted(m: boolean, fromUser = false): void {

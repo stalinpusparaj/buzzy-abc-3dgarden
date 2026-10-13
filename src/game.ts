@@ -13,6 +13,9 @@ import { Sfx } from './core/sfx';
 import { Scope } from './core/tween';
 import { Voice } from './core/voice';
 import lettersEn from './data/letters.en.json';
+import lettersTa from './data/letters.ta.json';
+import { loadFont } from './core/fonts';
+import { decorateSaved } from './scenes/Bloom';
 import type { Lang, LetterDef } from './data/types';
 import { World } from './scenes/World';
 import { Hud } from './ui/hud';
@@ -26,7 +29,7 @@ export type States = {
 
 const LETTERS: Record<Lang, LetterDef[]> = {
   en: lettersEn as LetterDef[],
-  ta: [],
+  ta: lettersTa as LetterDef[], // REVIEW(ta): content from brief §6.3
 };
 
 /** Everything a scene or mini-game needs, built once at boot. */
@@ -83,6 +86,8 @@ export class Game {
     this.input = new Input(renderer.domElement, camera);
     this.input.setListener((e) => this.machine.pointer(e));
     this.hud = new Hud(ui);
+    this.hud.setLang(this.lang);
+    document.documentElement.lang = this.lang;
     this.hud.onHome = () => {
       if (this.machine.current !== 'garden') this.machine.go('garden', undefined);
     };
@@ -99,6 +104,22 @@ export class Game {
     this.world.setLetters(this.letters());
     this.world.particles.cap = this.quality.particles;
     this.quality.onChange(() => (this.world.particles.cap = this.quality.particles));
+  }
+
+  /** Switch language: rebuild the buds + saved blooms, swap the music loop (brief Phase 4). */
+  async setLang(lang: Lang): Promise<void> {
+    if (lang === this.lang) return;
+    this.lang = lang;
+    this.storage.update((d) => (d.lang = lang));
+    this.hud.setLang(lang);
+    this.voice.stop();
+    const font = loadFont(lang); // only bubbles need it; rebuild the garden right away
+    this.world.setLetters(this.letters());
+    decorateSaved(this);
+    if (this.audio.unlocked) void this.music.start(lang);
+    document.documentElement.lang = lang;
+    if (this.machine.current === 'garden') this.machine.go('garden', undefined);
+    await font;
   }
 
   setTargets(fn: () => Vector3[], wrong: () => Vector3[] = () => []): void {

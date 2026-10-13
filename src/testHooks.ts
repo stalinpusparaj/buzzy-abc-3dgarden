@@ -29,6 +29,9 @@ export interface TestApi {
   cueLog(): { id: string; expected: number; actual: number }[];
   audioState(): string;
   songDuration(): number;
+  budIds(): string[];
+  lang(): string;
+  previewGlyph(lang: 'en' | 'ta', glyph: string): Promise<void>;
   /** On-screen size (CSS px) of each bud's visual bounds and its hit collider. */
   tapTargets(): { id: string; visualW: number; visualH: number; collider: number }[];
 }
@@ -86,6 +89,13 @@ export function installTestHooks(g: Game): void {
     cueLog: () => [...g.cueLog],
     audioState: () => g.audio.ctx?.state ?? 'none',
     songDuration: () => g.songDuration,
+    budIds: () => g.world.buds.map((b) => b.letter.id),
+    lang: () => g.lang,
+    previewGlyph: async (lang, glyph) => {
+      g.machine.go('start', undefined);
+      const { previewGlyph } = await import('./testPreview');
+      await previewGlyph(g, lang, glyph);
+    },
     fps: () => (frames.length ? 1000 / (frames.reduce((a, b) => a + b, 0) / frames.length) : 0),
     tier: () => g.quality.tier,
     bloomed: () => [...g.storage.get().bloomed],

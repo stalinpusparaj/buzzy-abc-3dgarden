@@ -51,3 +51,16 @@
 8. Risk: this is not a real iPhone. WebKit on macOS exercises the same Web Audio code, but iOS-only behaviours (silent switch, Low Power Mode, AirPods hand-off) need the Phase 7 device check.
 9. Risk: the full song plays on the VO bus (volume 1.0), so the parent's "Voice" slider also sets song volume. Simple, but worth knowing.
 10. Risk: speechSynthesis voices vary a lot between devices (many Androids have no ta-IN voice). The chime fallback works, but recorded VO is what makes the Tamil experience good.
+
+## Phase 4: Tamil (2026-10-13)
+
+1. ✅ All 6 Tamil letters (அ ஆ இ ஈ உ ஊ) play end to end with real pointer input (e2e).
+2. ✅ Screenshot tests render each Tamil glyph twice, as the extruded 3D letter and as canvas text in Baloo Thambi 2. Baselines checked by eye: no fallback glyphs, no tofu.
+3. ✅ The i18n completeness check passes: every shared VO id and parent-zone string has both languages, and every letter has VO in its own language (`validate-data`, part of every build).
+4. ✅ The fonts pipeline covers both languages; each uyir letter is confirmed as one code point with its own glyph, so no exceptions were logged.
+5. ✅ A big "A / அ" toggle on the garden HUD rebuilds the buds, restores that language's saved blooms, swaps the music loop and sets `<html lang>`. The parent-zone toggle lands in Phase 5.
+6. ✅ No-Tamil-voice fallback: glyphs on screen squash and a chime plays.
+7. Stubbed: Tamil strokes are skeleton-derived placeholders (`placeholder: true`), for you to author in `/?dev=strokes&lang=ta`.
+8. Stubbed: all Tamil words, VO lines and parent-zone strings are marked REVIEW(ta) for the primer check; `cues.ta.json` is empty until the Tamil song exists.
+9. Risk: speechSynthesis Tamil quality varies by device (many have no ta-IN voice), so the recorded Tamil VO in Phase 6 matters more than the English.
+10. Risk: the glyph screenshot tests only run on macOS; they're skipped on Linux CI.

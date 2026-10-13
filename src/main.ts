@@ -1,6 +1,7 @@
 import { loadFont } from './core/fonts';
+import { squash } from './entities/juice';
 import { Game } from './game';
-import { decorateBloom } from './scenes/Bloom';
+import { decorateSaved } from './scenes/Bloom';
 import { GardenScene } from './scenes/GardenScene';
 import { LetterFlow } from './scenes/LetterFlow';
 import { overviewPose } from './scenes/poses';
@@ -33,13 +34,20 @@ async function boot(): Promise<void> {
   g.machine.register('sing', new SingAlong(g));
   installTestHooks(g);
 
-  g.voice.onNoVoice = () => g.sfx.play('chime');
+  // No Tamil TTS voice on this device: pulse whatever glyph is on screen and chime (brief §6.4).
+  g.voice.onNoVoice = () => {
+    g.sfx.play('chime');
+    g.rc.scene.traverse((o) => {
+      if (o.name.startsWith('glyph-') && o.visible) void squash(g.scope, o, 0.25);
+    });
+  };
+  g.hud.onLang = () => void g.setLang(g.lang === 'en' ? 'ta' : 'en');
   // Fonts + SFX in parallel with the first frames; never block on them for long.
   await Promise.race([
     Promise.all([loadFont(g.lang), g.sfx.load()]),
     new Promise((r) => setTimeout(r, 4000)),
   ]);
-  decorateBloomed(g);
+  decorateSaved(g);
   loading.progress(0.8);
   g.machine.go('start', undefined);
   g.rig.set(overviewPose(g.aspect));
@@ -58,12 +66,6 @@ async function boot(): Promise<void> {
   g.machine.go('garden', undefined);
   void g.music.start(g.lang);
   void g.voice.say('welcome').then(() => g.voice.say('pick_flower'));
-}
-
-/** Re-create saved blooms (they persist in the garden, brief §5.1). */
-function decorateBloomed(g: Game): void {
-  const bloomed = g.storage.get().bloomed;
-  for (const b of g.world.buds) if (bloomed.includes(b.letter.id)) decorateBloom(g, b);
 }
 
 void boot();

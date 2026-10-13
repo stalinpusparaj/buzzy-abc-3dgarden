@@ -93,6 +93,7 @@ export class Bubble {
     g.renderOrder = 4;
     this.body.add(s, g, shine);
     this.root.add(this.body);
+    this.root.name = `glyph-bubble-${glyph}`;
     this.collider = sphereCollider(this.root, radius * 1.5);
     this.collider.userData.bubble = this;
   }

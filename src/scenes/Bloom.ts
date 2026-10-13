@@ -39,6 +39,12 @@ export function decorateBloom(g: Game, bud: Bud): { glyph: Group; object: Group 
   return { glyph, object: object };
 }
 
+/** Re-create saved blooms for the current language (they persist in the garden, brief §5.1). */
+export function decorateSaved(g: Game): void {
+  const bloomed = g.storage.get().bloomed;
+  for (const b of g.world.buds) if (bloomed.includes(b.letter.id)) decorateBloom(g, b);
+}
+
 /** Bloom (brief §5.1, ~5 s): full bloom, glyph + object grow, confetti, Buzzy celebrates. */
 export async function runBloom(g: Game, s: Scope, bud: Bud, letter: LetterDef): Promise<void> {
   g.storage.addUnique('bloomed', letter.id); // saved first: leaving mid-bloom still counts

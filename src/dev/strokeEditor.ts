@@ -89,6 +89,22 @@ export function startStrokeEditor(root: HTMLElement): void {
 
   const draw = (): void => {
     g.clearRect(0, 0, SIZE, SIZE);
+    // 0.1 grid with labels, to read off coordinates.
+    g.lineWidth = 1;
+    g.font = '10px system-ui';
+    for (let i = 1; i < 10; i++) {
+      const p = (i / 10) * SIZE;
+      g.strokeStyle = i === 5 ? '#d6cbb5' : '#f0e9dc';
+      g.beginPath();
+      g.moveTo(p, 0);
+      g.lineTo(p, SIZE);
+      g.moveTo(0, p);
+      g.lineTo(SIZE, p);
+      g.stroke();
+      g.fillStyle = '#b8ad98';
+      g.fillText((i / 10).toFixed(1), p + 2, SIZE - 3);
+      g.fillText((1 - i / 10).toFixed(1), 2, p - 2);
+    }
     g.strokeStyle = '#e4dccb';
     g.strokeRect(0.05 * SIZE, 0.05 * SIZE, 0.9 * SIZE, 0.9 * SIZE);
     const l = letter();
