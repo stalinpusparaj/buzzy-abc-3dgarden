@@ -6,11 +6,11 @@
     "word": "அணில்",
     "wordRoman": "aṇil (squirrel)",
     "objectModel": "squirrel",
-    "template": "pollenPop",
+    "template": "traceTrail",
     "distractors": ["ஆ", "இ", "ஈ", "உ", "ஊ"],
     "matchDistractors": [],
     "vo": {
-      "intro": "pp_instruction",
+      "intro": "tt_instruction",
       "isFor": "ta_a_isfor",
       "sound": "ta_a_sound"
     },
@@ -40,11 +40,11 @@
     "word": "இலை",
     "wordRoman": "ilai (leaf)",
     "objectModel": "leaf",
-    "template": "basketMatch",
+    "template": "traceTrail",
     "distractors": [],
     "matchDistractors": ["squirrel", "swing"],
     "vo": {
-      "intro": "bm_instruction",
+      "intro": "tt_instruction",
       "isFor": "ta_i_isfor",
       "sound": "ta_i_sound"
     },
@@ -57,11 +57,11 @@
     "word": "ஈ",
     "wordRoman": "ī (housefly)",
     "objectModel": "fly",
-    "template": "pollenPop",
+    "template": "traceTrail",
     "distractors": ["அ", "ஆ", "இ", "உ", "ஊ"],
     "matchDistractors": [],
     "vo": {
-      "intro": "pp_instruction",
+      "intro": "tt_instruction",
       "isFor": "ta_ii_isfor",
       "sound": "ta_ii_sound"
     },
@@ -91,11 +91,11 @@
     "word": "ஊஞ்சல்",
     "wordRoman": "ūñcal (swing)",
     "objectModel": "swing",
-    "template": "basketMatch",
+    "template": "traceTrail",
     "distractors": [],
     "matchDistractors": ["leaf", "goat"],
     "vo": {
-      "intro": "bm_instruction",
+      "intro": "tt_instruction",
       "isFor": "ta_uu_isfor",
       "sound": "ta_uu_sound"
     },
